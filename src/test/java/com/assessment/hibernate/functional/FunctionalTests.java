@@ -1,55 +1,56 @@
 package com.assessment.hibernate.functional;
 
+import static com.assessment.hibernate.testutils.MasterData.getAllBooks;
+import static com.assessment.hibernate.testutils.MasterData.getAllSubjects;
+import static com.assessment.hibernate.testutils.MasterData.getBook;
+import static com.assessment.hibernate.testutils.MasterData.getSubject;
+import static com.assessment.hibernate.testutils.TestUtils.businessTestFile;
+import static com.assessment.hibernate.testutils.TestUtils.currentTest;
+import static com.assessment.hibernate.testutils.TestUtils.yakshaAssert;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.stereotype.Component;
-
-import static com.assessment.hibernate.testutils.TestUtils.businessTestFile;
-import static com.assessment.hibernate.testutils.TestUtils.currentTest;
-import static com.assessment.hibernate.testutils.TestUtils.yakshaAssert;
-import static com.assessment.hibernate.testutils.MasterData.*;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.util.List;
-
-import javax.transaction.Transactional;
 
 import com.assessment.hibernate.model.Book;
 import com.assessment.hibernate.model.Subject;
 import com.assessment.hibernate.repository.EntityDaoImpl;
 
 
-@Component
+//@Component
 public class FunctionalTests {
 	@InjectMocks
-	private EntityDaoImpl entityDao;
+	private static EntityDaoImpl entityDao;
 
 	@Mock
-	SessionFactory sessionFactory;
+	static SessionFactory sessionFactory;
 	
 	@Mock
-	Session session;
-	
-
-	@Mock
-	Transaction transaction;
+	static Session session;
 	
 
 	@Mock
-	Criteria criteria;
+	static Transaction transaction;
 	
-	@Before
-	public void setupMock(){
-	    MockitoAnnotations.initMocks(this);
+
+	@Mock
+	static Criteria criteria;
+	
+	@BeforeAll
+	public static void setupMock(){
+	    MockitoAnnotations.initMocks(new FunctionalTests());
 	    sessionFactory = mock(SessionFactory.class);
 	    session = mock(Session.class);
 	    criteria = mock(Criteria.class);
@@ -65,7 +66,7 @@ public class FunctionalTests {
 			when(session.save(getSubject())).thenReturn(id);
 			when(session.getTransaction()).thenReturn(transaction);
 				
-			boolean status = this.entityDao.addSubject(getSubject());
+			boolean status = entityDao.addSubject(getSubject());
 			
 			yakshaAssert(currentTest(),
 					(status==true?"true":"false"),
@@ -87,7 +88,7 @@ public class FunctionalTests {
 				when(session.save(getBook())).thenReturn(id);
 				when(session.getTransaction()).thenReturn(transaction);
 					
-				boolean status = this.entityDao.addBook(getBook());
+				boolean status = entityDao.addBook(getBook());
 				
 				yakshaAssert(currentTest(),
 						(status==true?"true":"false"),
@@ -107,7 +108,7 @@ public class FunctionalTests {
 				when(sessionFactory.openSession()).thenReturn(session);
 				when(session.getTransaction()).thenReturn(transaction);
 					
-				boolean status = this.entityDao.deleteSubject(1L);
+				boolean status = entityDao.deleteSubject(1L);
 				
 				yakshaAssert(currentTest(),
 						(status==true?"true":"false"),
@@ -128,7 +129,7 @@ public class FunctionalTests {
 				when(session.load(Subject.class, 1L)).thenReturn(getSubject());
 				when(session.get(Subject.class, 1L)).thenReturn(getSubject());
 					
-				Subject subject = this.entityDao.searchSubject(1L);
+				Subject subject = entityDao.searchSubject(1L);
 				
 				yakshaAssert(currentTest(),
 						(subject != null?"true":"false"),
@@ -148,7 +149,7 @@ public class FunctionalTests {
 				when(sessionFactory.openSession()).thenReturn(session);
 				when(session.getTransaction()).thenReturn(transaction);
 					
-				boolean status = this.entityDao.deleteBook(1L);
+				boolean status = entityDao.deleteBook(1L);
 				
 				yakshaAssert(currentTest(),
 						(status==true?"true":"false"),
@@ -169,7 +170,7 @@ public class FunctionalTests {
 				when(session.load(Book.class, 1L)).thenReturn(getBook());
 				when(session.get(Book.class, 1L)).thenReturn(getBook());
 					
-				Book book= this.entityDao.searchBook(1L);
+				Book book= entityDao.searchBook(1L);
 				
 				yakshaAssert(currentTest(),
 						(book != null?"true":"false"),
@@ -190,7 +191,7 @@ public class FunctionalTests {
 				when(session.createCriteria(Subject.class)).thenReturn(criteria);
 				when(criteria.list()).thenReturn(getAllSubjects());
 									
-				List<Subject> subjects= this.entityDao.showAllSubjects();
+				List<Subject> subjects= entityDao.showAllSubjects();
 				
 				yakshaAssert(currentTest(),
 						(subjects != null?"true":"false"),
@@ -211,7 +212,7 @@ public class FunctionalTests {
 				when(session.createCriteria(Book.class)).thenReturn(criteria);
 				when(criteria.list()).thenReturn(getAllBooks());
 									
-				List<Book> Books= this.entityDao.showAllBooks();
+				List<Book> Books= entityDao.showAllBooks();
 				
 				yakshaAssert(currentTest(),
 						(Books != null?"true":"false"),
